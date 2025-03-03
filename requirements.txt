@@ -1,0 +1,20 @@
+pandas 
+mlflow
+notebook
+numpy
+tensorflow
+torch
+torchvision
+scikit-learn
+scikit-image
+opencv-python
+matplotlib
+python-box==6.0.2
+pyYAML
+tqdm
+ensure
+joblib
+types-PyYAML
+Flask
+Flask-Cors
+-e .

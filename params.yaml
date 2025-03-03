@@ -1,0 +1,5 @@
+craft_image_processing:
+  norm_mean: (0.485, 0.456, 0.406)
+  norm_variance: (0.229, 0.224, 0.225)
+  canvas_size: 1280
+  mag_ratio: 1.5

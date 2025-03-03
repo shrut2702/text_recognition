@@ -1,0 +1,13 @@
+artifacts_root: artifacts
+
+demo_image:
+  image_url: https://editor.analyticsvidhya.com/uploads/41548id_craft_av.jpg
+  image_dir: artifacts/image/input
+
+image_processing:
+  image_path: artifacts/image/input/demo.jpg
+  result_path: artifacts/image/result
+
+craft_model:
+  craft_weights: artifacts/models/craft/craft_mlt_25k.pth
+  refiner_weights: artifacts/models/craft/craft_refiner_CTW1500.pth
