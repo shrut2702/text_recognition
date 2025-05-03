@@ -1,6 +1,8 @@
 from mlOCR.constants import *
 from mlOCR.utils.common import read_yaml, create_directories
-from mlOCR.entity.config_entity import CraftModelConfig, ImageProcessingConfig,DemoImageConfig
+from mlOCR.entity.config_entity import (TextPostProcessingConfig, TextRecognitionConfig, TextDetectionConfig,
+                                         ImageProcessingConfig,DemoImageConfig)
+from pathlib import Path
 
 class ConfigurationManager:
     def __init__(
@@ -44,11 +46,48 @@ class ConfigurationManager:
 
         return image_processing_config
     
-    def get_craft_model_config(self)->CraftModelConfig:
-        config=self.config.craft_model
+    def get_text_detection_config(self)->TextDetectionConfig:
+        config=self.config.text_detection
+        params=self.params.text_detection
 
-        craft_model_config=CraftModelConfig(
-            model_weight=config.model_path
+        text_detection_config=TextDetectionConfig(
+            craft_weights=Path(config.craft_weights),
+            refiner_weights=Path(config.refiner_weights),
+            loaded_image_path=Path(config.loaded_image_path),
+            normalized_image_path=Path(config.normalized_image_path),
+            resized_data_path=Path(config.resized_data_path),
+            text_threshold=float(params.text_threshold),
+            low_text=float(params.low_text),
+            link_threshold=float(params.link_threshold),
+            poly=bool(params.poly),
+            refine=bool(params.refine)
         )
 
-        return craft_model_config
+        return text_detection_config
+    
+    def get_text_recognition_config(self)->TextRecognitionConfig:
+        config=self.config.text_recognition
+        params=self.params.text_recognition
+
+        create_directories([config.crnn_output_path])
+
+        text_recognition_config=TextRecognitionConfig(
+            crnn_weights_digital=Path(config.crnn_weights_digital),
+            crnn_weights_handwritten=Path(config.crnn_weights_handwritten),
+            crnn_input_path=Path(config.crnn_input_path),
+            crnn_output_path=Path(config.crnn_output_path),
+            resize_canvas=tuple(map(int,params.resize_canvas.translate(str.maketrans('','','()')).split(','))),
+            sorting_threshold=float(params.sorting_threshold),
+            char_list=params.char_list
+        )
+
+        return text_recognition_config
+    
+    def get_text_post_processing_config(self)->TextPostProcessingConfig:
+        config=self.config.text_post_processing
+
+        text_post_processing_config=TextPostProcessingConfig(
+            text_input_path=Path(config.text_input_path)
+        )
+
+        return text_post_processing_config

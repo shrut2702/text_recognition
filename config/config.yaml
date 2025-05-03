@@ -8,6 +8,19 @@ image_processing:
   image_path: artifacts/image/input/demo.jpg
   result_path: artifacts/image/result
 
-craft_model:
+text_detection:
   craft_weights: artifacts/models/craft/craft_mlt_25k.pth
   refiner_weights: artifacts/models/craft/craft_refiner_CTW1500.pth
+  loaded_image_path: artifacts/image/result/demo_transformed.jpg
+  normalized_image_path: artifacts/image/result/demo_normalized.jpg
+  resized_data_path: artifacts/image/result/resized_data.pkl
+
+text_recognition:
+  #crnn_weights: artifacts/models/crnn/crnn_epoch_2_12.h5
+  crnn_weights_digital: artifacts/models/crnn/crnn_synthdata_keras_9_11char_epoch_04.h5
+  crnn_weights_handwritten: artifacts/models/crnn/crnn_synthdata_keras_9_11char_epoch_04.h5
+  crnn_input_path: artifacts/image/result
+  crnn_output_path: artifacts/output/crnn
+
+text_post_processing:
+  text_input_path: artifacts/output/crnn

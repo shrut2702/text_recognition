@@ -9,11 +9,11 @@ class ImageProcessingPipeline:
     def __init__(self):
         pass
 
-    def main(self):
+    def main(self, img):
         config=ConfigurationManager()
         image_processing_config=config.get_image_processing_config()
         image_processing=ImageProcessing(image_processing_config)
-        image=image_processing.loadImage()
+        image=image_processing.loadImage(img)
         save_image(image,'demo_transformed.jpg',image_processing.result_path)
         resized_image,ratio,size_heatmap=image_processing.resize_aspect_ratio(image)
         normalized_image=image_processing.normalizeMeanVariance(resized_image)

@@ -98,7 +98,7 @@ def save_bin(data, filename:str, path: Path):
 
 
 @ensure_annotations
-def load_bin(path: Path) -> Any:
+def load_bin(path: Path):
     """load binary data
 
     Args:
@@ -140,5 +140,32 @@ def save_image(image, filename:str,path: Path):
     logger.info(f"Image saved at: {path}")
 
 
+@ensure_annotations
+def save_text_file(text: str, filename: str, path: Path):
+    """Save a text file to a specified path.
+
+    Args:
+        text (str): Text data to be saved.
+        filename (str): Name of the text file.
+        path (Path): Path where the text file should be saved.
+    """
+    with open(os.path.join(path, filename), 'w') as file:
+        file.write(text)
+    logger.info(f"Text file saved at: {path}")
 
 
+@ensure_annotations
+def load_text_file(path: Path) -> str:
+    """Load a text file from a specified path.
+
+    Args:
+        filename (str): Name of the text file to load.
+        path (Path): Path where the text file is located.
+
+    Returns:
+        str: Contents of the text file.
+    """
+    with open(path, 'r') as file:
+        text = file.read()
+    logger.info(f"Text file loaded from: {path}")
+    return text

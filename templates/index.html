@@ -1,0 +1,413 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Text Recognition AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        background: radial-gradient(
+          ellipse at center,
+          #0f172a 0%,
+          #1e293b 100%
+        );
+        min-height: 100vh;
+        font-family: "Inter", sans-serif;
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 1rem;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+      .drag-drop {
+        border: 2px dashed rgba(255, 255, 255, 0.2);
+      }
+      .transition-max-height {
+        transition: max-height 0.5s ease;
+        overflow: hidden;
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 18px;
+        width: 18px;
+        background: #38bdf8;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+      }
+    </style>
+  </head>
+
+  <body class="flex flex-col items-center justify-center text-white px-4 py-10">
+    
+    <header class="w-full flex justify-between items-center px-10 py-6">
+      <h1 class="text-2xl font-bold tracking-wider">TEXT RECOGNITION AI</h1>
+      <button
+        id="switchModeBtn"
+        class="text-sky-400 hover:underline transition text-lg"
+      >
+        Switch to Handwritten
+      </button>
+    </header>
+
+    <main class="w-full max-w-2xl mt-6 p-8 glass shadow-xl">
+      <h2 class="text-4xl font-bold text-center mb-2">Text Recognition</h2>
+      <p class="text-center mb-10 text-gray-300">
+        Extract text from images with AI technology
+      </p>
+
+      <div
+        id="uploadArea"
+        class="flex flex-col items-center justify-center p-8 drag-drop glass mb-8 cursor-pointer"
+      >
+        <p class="text-gray-300 mb-4">Drag & Drop an image</p>
+        <p class="text-gray-500 mb-4">or</p>
+        <button
+          class="bg-white bg-opacity-10 px-6 py-2 rounded-lg hover:bg-opacity-20 transition"
+        >
+          Browse Image
+        </button>
+        <input id="fileInput" type="file" class="hidden" />
+      </div>
+
+      <div class="glass p-6 mb-8">
+        <p class="text-center text-gray-300">Detected text will appear here.</p>
+      </div>
+
+      <div class="text-center mb-6">
+        <button
+          class="px-10 py-3 bg-white bg-opacity-10 rounded-lg backdrop-blur-lg hover:bg-opacity-20 transition font-semibold"
+        >
+          Extract Text
+        </button>
+      </div>
+
+      <div class="text-center mb-6">
+        <button
+          id="toggleSettings"
+          class="px-6 py-2 rounded-lg border border-sky-400 text-sky-300 hover:bg-sky-500 hover:text-white transition"
+        >
+          Advanced Settings
+        </button>
+      </div>
+
+      <div
+        id="settingsPanel"
+        class="transition-max-height max-h-0 overflow-hidden"
+      >
+        <div class="space-y-6 mt-8">
+          <div>
+            <label class="block mb-2 text-gray-400">Text Threshold</label>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value="0.5"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block mb-2 text-gray-400">Text Size</label>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value="0.5"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block mb-2 text-gray-400">Text Proximity</label>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value="0.5"
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // Toggle Advanced Settings
+      const toggleBtn = document.getElementById("toggleSettings");
+      const panel = document.getElementById("settingsPanel");
+      toggleBtn.addEventListener("click", () => {
+        if (panel.classList.contains("max-h-0")) {
+          panel.classList.remove("max-h-0");
+          panel.classList.add("max-h-screen");
+        } else {
+          panel.classList.remove("max-h-screen");
+          panel.classList.add("max-h-0");
+        }
+      });
+
+      // Switch Between Digital/Handwritten
+      const switchBtn = document.getElementById("switchModeBtn");
+      let isDigital = true;
+      switchBtn.addEventListener("click", () => {
+        isDigital = !isDigital;
+        switchBtn.innerText = isDigital
+          ? "Switch to Handwritten"
+          : "Switch to Digital";
+      });
+
+      // Upload Area (click to browse)
+      const uploadArea = document.getElementById("uploadArea");
+      const fileInput = document.getElementById("fileInput");
+      uploadArea.addEventListener("click", () => fileInput.click());
+    </script>
+  </body>
+</html>
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Text Recognition AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        background: radial-gradient(
+          ellipse at center,
+          #0f172a 0%,
+          #1e293b 100%
+        );
+        min-height: 100vh;
+        font-family: "Inter", sans-serif;
+        color: rgba(255, 255, 255, 0.8); /* Soft frosted text */
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 1rem;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+      .drag-drop {
+        border: 2px dashed rgba(255, 255, 255, 0.2);
+      }
+      .transition-max-height {
+        transition: max-height 0.5s ease;
+        overflow: hidden;
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0.4) 50%,
+          rgba(255, 255, 255, 0.1) 50%
+        );
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        border-radius: 10px;
+        outline: none;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 16px;
+        width: 16px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5);
+      }
+    </style>
+  </head>
+
+  <body class="flex flex-col items-center justify-center px-4 py-10">
+    <!-- Header -->
+    <header class="w-full flex justify-between items-center px-10 py-6">
+      <h1 class="text-2xl font-bold tracking-wider">TEXT RECOGNITION AI</h1>
+      <button id="switchModeBtn" class="hover:underline transition text-lg">
+        Switch to Handwritten
+      </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-2xl mt-6 p-8 glass shadow-xl">
+      <h2 class="text-4xl font-bold text-center mb-2">Text Recognition</h2>
+      <p class="text-center mb-10">
+        Extract text from images with AI technology
+      </p>
+
+      <!-- Drag and Drop Section -->
+      <div
+        id="uploadArea"
+        class="flex flex-col items-center justify-center p-8 drag-drop glass mb-8 cursor-pointer"
+      >
+        <p class="mb-4">Drag & Drop an image</p>
+        <p class="mb-4">or</p>
+        <button
+          class="bg-white bg-opacity-10 px-6 py-2 rounded-lg hover:bg-opacity-20 transition"
+        >
+          Browse Image
+        </button>
+        <input id="fileInput" type="file" class="hidden" />
+      </div>
+
+      <!-- Detected Text Output -->
+      <div class="glass p-6 mb-8">
+        <p class="text-center">Detected text will appear here.</p>
+      </div>
+
+      <!-- Extract and Settings Buttons Side-by-Side -->
+      <div class="flex justify-center items-center gap-4 mb-6">
+        <button
+          class="px-8 py-3 bg-white bg-opacity-10 rounded-lg backdrop-blur-lg hover:bg-opacity-20 transition font-semibold"
+        >
+          Extract Text
+        </button>
+
+        <!-- Gear icon as pure inline SVG -->
+        <button
+          id="toggleSettings"
+          class="p-3 bg-white bg-opacity-10 rounded-lg backdrop-blur-lg hover:bg-opacity-20 transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-white opacity-80"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 4.5v1.75M12 17.75v1.75M4.5 12H6.25M17.75 12h1.75M7.5 7.5l1.25 1.25M15.25 15.25l1.25 1.25M7.5 16.5l1.25-1.25M15.25 8.75l1.25-1.25M12 9.75A2.25 2.25 0 1112 14.25a2.25 2.25 0 010-4.5z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Advanced Settings Panel -->
+      <div
+        id="settingsPanel"
+        class="transition-max-height max-h-0 overflow-hidden"
+      >
+        <div class="space-y-8 mt-8 px-2">
+          <div>
+            <label class="block mb-2"
+              >Text Threshold: <span id="thresholdValue">0.5</span></label
+            >
+            <div class="px-2">
+              <input
+                id="thresholdSlider"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value="0.5"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block mb-2"
+              >Text Size: <span id="sizeValue">0.5</span></label
+            >
+            <div class="px-2">
+              <input
+                id="sizeSlider"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value="0.5"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block mb-2"
+              >Text Proximity: <span id="proximityValue">0.5</span></label
+            >
+            <div class="px-2">
+              <input
+                id="proximitySlider"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value="0.5"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- JavaScript Section -->
+    <script>
+      // Toggle Advanced Settings
+      const toggleBtn = document.getElementById("toggleSettings");
+      const panel = document.getElementById("settingsPanel");
+      toggleBtn.addEventListener("click", () => {
+        panel.classList.toggle("max-h-0");
+        panel.classList.toggle("max-h-screen");
+      });
+
+      // Switch Digital/Handwritten
+      const switchBtn = document.getElementById("switchModeBtn");
+      let isDigital = true;
+      switchBtn.addEventListener("click", () => {
+        isDigital = !isDigital;
+        switchBtn.innerText = isDigital
+          ? "Switch to Handwritten"
+          : "Switch to Digital";
+      });
+
+      // Upload Area click trigger
+      const uploadArea = document.getElementById("uploadArea");
+      const fileInput = document.getElementById("fileInput");
+      uploadArea.addEventListener("click", () => fileInput.click());
+
+      // Slider Value and Track Fill Updates
+      const sliders = [
+        { sliderId: "thresholdSlider", valueId: "thresholdValue" },
+        { sliderId: "sizeSlider", valueId: "sizeValue" },
+        { sliderId: "proximitySlider", valueId: "proximityValue" },
+      ];
+
+      sliders.forEach(({ sliderId, valueId }) => {
+        const slider = document.getElementById(sliderId);
+        const value = document.getElementById(valueId);
+
+        const updateBackground = (el) => {
+          const percent = ((el.value - el.min) / (el.max - el.min)) * 100;
+          el.style.background = `linear-gradient(to right, rgba(255,255,255,0.4) ${percent}%, rgba(255,255,255,0.1) ${percent}%)`;
+        };
+
+        slider.addEventListener("input", () => {
+          value.innerText = slider.value;
+          updateBackground(slider);
+        });
+
+        updateBackground(slider);
+      });
+    </script>
+  </body>
+</html>
