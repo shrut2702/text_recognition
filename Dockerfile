@@ -2,7 +2,9 @@
 FROM python:3.12.3-slim
 
 # Install required system packages for OpenCV
-RUN apt-get update && apt-get install -y libgl1
+RUN apt update && apt install -y \
+    libgl1 \
+    libglib2.0-0
 
 # Set the working directory in the container
 WORKDIR /app
