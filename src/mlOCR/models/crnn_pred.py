@@ -115,7 +115,7 @@ def crnn_pred_model():
     # Hence, downsampled feature maps are 16x smaller. The number of
     # filters in the last layer is 64. Reshape accordingly before
     # passing the output to the RNN part of the model
-    new_shape = ((112 // 16), (28 // 16) * 64)
+    new_shape = ((224 // 16), (56 // 16) * 64)
     #new_shape = ((img_width // 4), (img_height // 4) * 64)
     x = layers.Reshape(target_shape=new_shape, name="reshape")(x)
     x = layers.Dense(64, activation="relu", name="dense1")(x)
