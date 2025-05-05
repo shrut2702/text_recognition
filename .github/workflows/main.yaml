@@ -1,4 +1,97 @@
-name: workflow
+# name: workflow
+
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths-ignore:
+#       - "README.md"
+
+# permissions:
+#   id-token: write
+#   contents: read
+
+# jobs:
+#   integration:
+#     name: Continuous Integration
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v3
+
+#       - name: Lint code
+#         run: echo "Linting repository"
+
+#       - name: Run unit tests
+#         run: echo "Running unit tests"
+
+#   build-and-push-ecr-image:
+#     name: Continuous Delivery
+#     needs: integration
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v3
+
+#       - name: Install Utilities
+#         run: |
+#           sudo apt-get update
+#           sudo apt-get install -y jq unzip
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ secrets.AWS_REGION }}
+
+#       - name: Login to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v1
+
+#       - name: Build, tag, and push image to Amazon ECR
+#         id: build-image
+#         env:
+#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+#           IMAGE_TAG: latest
+#         run: |
+#           # Build a docker container and
+#           # push it to ECR so that it can
+#           # be deployed to ECS.
+#           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+#           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+#           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+#   Continuous-Deployment:
+#     needs: build-and-push-ecr-image
+#     runs-on: self-hosted
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v3
+
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ secrets.AWS_REGION }}
+
+#       - name: Login to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v1
+
+#       - name: Pull latest images
+#         run: |
+#           docker pull ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+
+#       - name: Run Docker Image to serve users
+#         run: |
+#           docker run -d -p 8080:8080 --name=mlOCR-proj -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}'  ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+#       - name: Clean previous images and containers
+#         run: |
+#           docker system prune -f
+
+name: GCP CI/CD Workflow
 
 on:
   push:
@@ -19,74 +112,70 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Lint code
+      - name: Lint Code
         run: echo "Linting repository"
 
-      - name: Run unit tests
+      - name: Run Unit Tests
         run: echo "Running unit tests"
 
-  build-and-push-ecr-image:
-    name: Continuous Delivery
+  build-and-push-artifact-registry:
+    name: Build and Push to Artifact Registry
     needs: integration
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Utilities
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq unzip
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
+
+      - name: Build, Tag, and Push Image to Artifact Registry
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+          AR_REGISTRY: ${{ secrets.GCP_REGION }}-docker.pkg.dev
+          AR_REPOSITORY: ${{ secrets.AR_REPOSITORY }}
           IMAGE_TAG: latest
         run: |
-          # Build a docker container and
-          # push it to ECR so that it can
-          # be deployed to ECS.
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          IMAGE_URL=$AR_REGISTRY/${{ secrets.GCP_PROJECT_ID }}/$AR_REPOSITORY/ml-ocr-image:$IMAGE_TAG
+          docker build -t $IMAGE_URL .
+          docker push $IMAGE_URL
+          echo "image=$IMAGE_URL" >> $GITHUB_OUTPUT
+        id: build-image
 
-  Continuous-Deployment:
-    needs: build-and-push-ecr-image
+  deploy-to-compute-engine:
+    name: Deploy to Compute Engine
+    needs: build-and-push-artifact-registry
     runs-on: self-hosted
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Pull latest images
+      - name: Pull Latest Image
+        env:
+          IMAGE_URL: ${{ needs.build-and-push-artifact-registry.outputs.image }}
         run: |
-          docker pull ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+          docker pull $IMAGE_URL
 
-      - name: Run Docker Image to serve users
+      - name: Run Docker Image
+        env:
+          IMAGE_URL: ${{ needs.build-and-push-artifact-registry.outputs.image }}
         run: |
-          docker run -d -p 8080:8080 --name=mlOCR-proj -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}'  ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
-      - name: Clean previous images and containers
+          docker stop ml-ocr-proj || true
+          docker rm ml-ocr-proj || true
+          docker run -d -p 8080:8080 --name=ml-ocr-proj \
+            -e 'GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}' \
+            $IMAGE_URL
+
+      - name: Clean Previous Images and Containers
         run: |
           docker system prune -f
