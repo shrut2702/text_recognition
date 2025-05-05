@@ -122,6 +122,8 @@ jobs:
     name: Build and Push to Artifact Registry
     needs: integration
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -141,6 +143,7 @@ jobs:
           gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
 
       - name: Build, Tag, and Push Image to Artifact Registry
+        id: build-image
         env:
           AR_REGISTRY: ${{ secrets.GCP_REGION }}-docker.pkg.dev
           AR_REPOSITORY: ${{ secrets.AR_REPOSITORY }}
@@ -150,7 +153,6 @@ jobs:
           docker build -t $IMAGE_URL .
           docker push $IMAGE_URL
           echo "image=$IMAGE_URL" >> $GITHUB_OUTPUT
-        id: build-image
 
   deploy-to-compute-engine:
     name: Deploy to Compute Engine
