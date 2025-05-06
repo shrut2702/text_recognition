@@ -163,20 +163,16 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Pull Latest Image
-        env:
-          IMAGE_URL: ${{ needs.build-and-push-artifact-registry.outputs.image }}
         run: |
-          docker pull $IMAGE_URL
+          docker pull ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.AR_REPOSITORY }}/ml-ocr-image:latest
 
       - name: Run Docker Image
-        env:
-          IMAGE_URL: ${{ needs.build-and-push-artifact-registry.outputs.image }}
         run: |
           docker stop ml-ocr-proj || true
           docker rm ml-ocr-proj || true
           docker run -d -p 8080:8080 --name=ml-ocr-proj \
             -e 'GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}' \
-            $IMAGE_URL
+            ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.AR_REPOSITORY }}/ml-ocr-image:latest
 
       - name: Clean Previous Images and Containers
         run: |
