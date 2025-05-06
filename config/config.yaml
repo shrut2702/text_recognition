@@ -18,7 +18,7 @@ text_detection:
 text_recognition:
   #crnn_weights: artifacts/models/crnn/crnn_epoch_2_12.h5
   crnn_weights_digital: artifacts/models/crnn/crnn_synthdata_keras_9_11char_epoch_04.h5
-  crnn_weights_handwritten: artifacts/models/crnn/crnn_synthdata_keras_9_11char_epoch_04.h5
+  crnn_weights_handwritten: artifacts/models/crnn/crnn_handwritten_keras_1_11char_epoch_06.h5
   crnn_input_path: artifacts/image/result
   crnn_output_path: artifacts/output/crnn
 
